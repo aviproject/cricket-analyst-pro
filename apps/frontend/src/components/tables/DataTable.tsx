@@ -11,7 +11,19 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
-import { cn } from '@/utils/helpers';
+import { cn } from '@/lib/utils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ChevronUp, ChevronDown, Search } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 type DataTableProps<T> = {
   title: string;
@@ -57,108 +69,124 @@ export function DataTable<T extends object>({
   const rows = useMemo(() => table.getRowModel().rows, [table]);
 
   return (
-    <div className="cap-panel rounded-2xl p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+    <Card className="cap-card-stat">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div>
-          <div className="text-sm font-semibold tracking-tight text-white">{title}</div>
-          <div className="text-xs text-[var(--muted)]">
+          <CardTitle className="text-lg font-semibold tracking-tight text-foreground">{title}</CardTitle>
+          <CardDescription className="text-xs mt-1">
             Sorted, filterable, and analyst-friendly
-          </div>
+          </CardDescription>
         </div>
-        {searchAccessor ? (
-          <input
-            value={globalFilter ?? ''}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder={searchPlaceholder}
-            className={cn(
-              'h-9 w-[240px] rounded-xl border border-white/10 bg-black/10 px-3 text-sm text-white placeholder:text-white/35',
-              'focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40',
-            )}
-          />
-        ) : null}
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-white/10">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-white/5 text-xs text-white/70">
+        {searchAccessor && (
+          <div className="relative w-full sm:w-[260px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={globalFilter ?? ''}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="pl-9 h-9"
+            />
+          </div>
+        )}
+      </CardHeader>
+      
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader className="bg-muted/30">
             {headerGroups.map((hg) => (
-              <tr key={hg.id}>
+              <TableRow key={hg.id} className="hover:bg-transparent">
                 {hg.headers.map((h) => {
                   const canSort = h.column.getCanSort();
                   const sort = h.column.getIsSorted();
                   return (
-                    <th
+                    <TableHead
                       key={h.id}
                       className={cn(
-                        'px-4 py-3 font-medium',
-                        canSort ? 'cursor-pointer select-none hover:bg-white/5' : '',
+                        'h-10 py-2',
+                        canSort && 'cursor-pointer select-none'
                       )}
                       onClick={canSort ? h.column.getToggleSortingHandler() : undefined}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         {flexRender(h.column.columnDef.header, h.getContext())}
-                        {sort ? (
-                          <span className="text-[10px] text-white/60">
-                            {sort === 'asc' ? '▲' : '▼'}
+                        {sort && (
+                          <span className="text-accent flex items-center">
+                            {sort === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                           </span>
-                        ) : null}
+                        )}
                       </div>
-                    </th>
+                    </TableHead>
                   );
                 })}
-              </tr>
+              </TableRow>
             ))}
-          </thead>
-          <tbody className="divide-y divide-white/8">
-            {rows.map((row) => (
-              <tr
-                key={row.id}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={cn(
-                  'text-white/90',
-                  onRowClick ? 'cursor-pointer hover:bg-white/4' : '',
-                )}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          </TableHeader>
+          <TableBody>
+            {rows.length ? (
+              rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  className={cn(
+                    'transition-colors group',
+                    onRowClick && 'cursor-pointer hover:bg-muted/30'
+                  )}
+                >
+                  {row.getVisibleCells().map((cell, idx) => (
+                    <TableCell 
+                      key={cell.id} 
+                      className={cn(
+                        "py-3 font-medium",
+                        idx === 0 && onRowClick && "relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-accent before:opacity-0 group-hover:before:opacity-100 before:transition-opacity"
+                      )}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
 
-      <div className="mt-3 flex items-center justify-between text-xs text-[var(--muted)]">
-        <div>
-          Showing{' '}
-          <span className="text-white/80">
-            {table.getState().pagination.pageIndex * pageSize + 1}–
-            {table.getState().pagination.pageIndex * pageSize + rows.length}
-          </span>{' '}
-          of <span className="text-white/80">{table.getFilteredRowModel().rows.length}</span>
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20 text-xs text-muted-foreground">
+          <div>
+            Showing{' '}
+            <span className="font-medium text-foreground">
+              {table.getState().pagination.pageIndex * pageSize + 1}–
+              {Math.min((table.getState().pagination.pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length)}
+            </span>{' '}
+            of <span className="font-medium text-foreground">{table.getFilteredRowModel().rows.length}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 shadow-sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 shadow-sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 hover:bg-white/8 transition disabled:opacity-40"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 hover:bg-white/8 transition disabled:opacity-40"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

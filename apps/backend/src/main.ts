@@ -7,13 +7,15 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Cricket Analyst Pro API')
-    .setDescription('Backend API for Cricket Analyst Pro (matches, players, analytics, simulation).')
+    .setDescription(
+      'Backend API for Cricket Analyst Pro (matches, players, analytics, simulation).',
+    )
     .setVersion('1.0.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

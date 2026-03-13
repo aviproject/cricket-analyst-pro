@@ -7,6 +7,9 @@ import { WinProbabilityChart } from '@/components/charts/WinProbabilityChart';
 import { RunRateChart } from '@/components/charts/RunRateChart';
 import type { BallEvent, Match } from '@/types/match.types';
 import { formatDate } from '@/utils/formatters';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { CalendarDays, MapPin } from 'lucide-react';
 
 const demoMatch: Match = {
   id: 'm_1024',
@@ -58,32 +61,69 @@ export function MatchDetailContainer({ id }: { id: string }) {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-8 animate-fade-in-up pb-8">
+      {/* Match Header */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b border-border/50 pb-6">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-white">
-            {match.home_team} vs {match.away_team}
+          <div className="flex items-center gap-2 mb-3">
+            <Badge variant="outline" className="text-accent border-accent/20 bg-accent/5">
+              Live Analysis
+            </Badge>
+            {match.result && (
+              <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                {match.result}
+              </Badge>
+            )}
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+            <span>{match.home_team}</span>
+            <span className="text-muted-foreground font-light text-2xl">vs</span>
+            <span>{match.away_team}</span>
           </h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            {formatDate(match.date)} • {match.venue} • {match.result ?? 'Result pending'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/85">
-            Scoreline: {match.home_score ?? '—'} / {match.away_score ?? '—'}
+          <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5"><CalendarDays className="h-4 w-4" />{formatDate(match.date)}</span>
+            <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" />{match.venue}</span>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/85">
-            Analyst mode: Timeline + Probabilities
+        </div>
+        
+        {/* Score Bug */}
+        <div className="flex items-center gap-6 rounded-xl border border-border bg-card/50 p-4 shadow-sm w-full md:w-auto overflow-x-auto">
+          <div className="text-center min-w-[80px]">
+            <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider mb-1">{match.home_team}</div>
+            <div className="text-2xl font-bold font-mono">{match.home_score ?? '—'}</div>
+          </div>
+          <div className="h-10 w-px bg-border max-md:hidden" />
+          <div className="text-center min-w-[80px]">
+            <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider mb-1">{match.away_team}</div>
+            <div className="text-2xl font-bold font-mono text-muted-foreground">{match.away_score ?? '—'}</div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <RunRateChart data={runRateSeries} />
-        <WinProbabilityChart data={winProbabilitySeries} />
-      </div>
-
-      <BallEventsTable data={demoEvents} />
+      <Tabs defaultValue="timeline" className="w-full">
+        <TabsList className="mb-6 w-full sm:w-auto h-auto p-1 bg-muted/50 border border-border/50">
+          <TabsTrigger value="timeline" className="rounded-md px-6 py-2">Timeline</TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-md px-6 py-2">Analytics</TabsTrigger>
+          <TabsTrigger value="phases" className="rounded-md px-6 py-2">Phases</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="timeline" className="space-y-6 mt-0 animate-fade-in-up">
+          <BallEventsTable data={demoEvents} />
+        </TabsContent>
+        
+        <TabsContent value="analytics" className="mt-0 animate-fade-in-up">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <RunRateChart data={runRateSeries} requiredRunRate={9.2} />
+            <WinProbabilityChart data={winProbabilitySeries} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="phases" className="mt-0 animate-fade-in-up">
+          <div className="h-32 flex items-center justify-center rounded-xl border border-dashed border-border text-muted-foreground text-sm">
+            Phase analysis visualization placeholder
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

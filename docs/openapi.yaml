@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+title: Cricket Analyst Pro API
+description: AI-powered cricket analytics and simulation platform
+version: 1.0.0
+
+servers:
+
+* url: http://localhost:4000/api
+
+tags:
+
+* name: Matches
+* name: Players
+* name: Simulation
+* name: Prediction
+* name: Reports
+
+paths:
+
+/matches:
+get:
+tags:
+- Matches
+summary: Get all matches
+responses:
+"200":
+description: List of matches
+content:
+application/json:
+schema:
+type: array
+items:
+$ref: "#/components/schemas/Match"
+
+/matches/{id}:
+get:
+tags:
+- Matches
+summary: Get match by ID
+parameters:
+- name: id
+in: path
+required: true
+schema:
+type: string
+responses:
+"200":
+description: Match details
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/Match"
+
+/players:
+get:
+tags:
+- Players
+summary: Get all players
+responses:
+"200":
+description: List of players
+content:
+application/json:
+schema:
+type: array
+items:
+$ref: "#/components/schemas/Player"
+
+/players/{id}:
+get:
+tags:
+- Players
+summary: Get player details
+parameters:
+- name: id
+in: path
+required: true
+schema:
+type: string
+responses:
+"200":
+description: Player information
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/Player"
+
+/predict-win-probability:
+post:
+tags:
+- Prediction
+summary: Predict win probability
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/WinProbabilityRequest"
+responses:
+"200":
+description: Prediction result
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/WinProbabilityResponse"
+
+/simulate-match:
+post:
+tags:
+- Simulation
+summary: Run match simulation
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/SimulationRequest"
+responses:
+"200":
+description: Simulation results
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/SimulationResponse"
+
+components:
+
+schemas:
+
+```
+Match:
+  type: object
+  properties:
+    id:
+      type: string
+    team_a_id:
+      type: string
+    team_b_id:
+      type: string
+    venue_id:
+      type: string
+    match_date:
+      type: string
+    format:
+      type: string
+    tournament:
+      type: string
+
+Player:
+  type: object
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    role:
+      type: string
+    batting_style:
+      type: string
+    bowling_style:
+      type: string
+    team_id:
+      type: string
+
+WinProbabilityRequest:
+  type: object
+  properties:
+    runs_required:
+      type: number
+    balls_remaining:
+      type: number
+    wickets:
+      type: number
+    current_run_rate:
+      type: number
+    required_run_rate:
+      type: number
+
+WinProbabilityResponse:
+  type: object
+  properties:
+    win_probability:
+      type: number
+    confidence:
+      type: number
+
+SimulationRequest:
+  type: object
+  properties:
+    runs_required:
+      type: number
+    balls_remaining:
+      type: number
+    wickets:
+      type: number
+    batting_order:
+      type: array
+      items:
+        type: string
+
+SimulationResponse:
+  type: object
+  properties:
+    win_probability:
+      type: number
+    simulations_run:
+      type: number
+    result_distribution:
+      type: object
+```

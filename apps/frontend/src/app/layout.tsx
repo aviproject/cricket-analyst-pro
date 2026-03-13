@@ -1,21 +1,27 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Geist } from 'next/font/google';
 import './globals.css';
 import { AppProviders } from './providers';
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetbrains = JetBrains_Mono({
+  variable: '--font-jetbrains',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Cricket Analyst Pro',
-  description: 'Professional cricket analytics platform',
+  title: 'Cricket Analyst Pro — Decision-grade Cricket Intelligence',
+  description:
+    'Professional cricket analytics platform for coaches and analysts. Match context, player form analysis, and AI-powered scenario simulation in one workspace.',
 };
 
 export default function RootLayout({
@@ -24,10 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={cn("font-sans", geist.variable)}>
+      <body className={`${inter.variable} ${jetbrains.variable} antialiased`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

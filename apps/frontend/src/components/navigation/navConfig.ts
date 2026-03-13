@@ -7,10 +7,12 @@ import {
   IconSimulation,
 } from './icons';
 
+import type React from 'react';
+
 export type NavItem = {
   href: string;
   label: string;
-  Icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  Icon: React.ComponentType<any>;
 };
 
 export const navItems: NavItem[] = [

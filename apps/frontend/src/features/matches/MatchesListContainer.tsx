@@ -3,6 +3,8 @@
 import { MatchesTable } from '@/components/tables/MatchesTable';
 import { useMatches } from '@/hooks/useMatches';
 import type { Match } from '@/types/match.types';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays } from 'lucide-react';
 
 const demoMatches: Match[] = [
   {
@@ -42,14 +44,24 @@ export function MatchesListContainer() {
   const matches = (data?.length ? (data as Match[]) : demoMatches).slice(0, 20);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-white">Matches</h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Browse fixtures and open match intelligence views with ball-by-ball context.
-        </p>
+    <div className="space-y-6 animate-fade-in-up">
+      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Badge variant="secondary" className="bg-muted text-muted-foreground flex gap-1.5 items-center">
+              <CalendarDays className="w-3.5 h-3.5" />
+              Tournament Mode
+            </Badge>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground cap-gradient-text">Matches</h1>
+          <p className="mt-2 text-base text-muted-foreground">
+            Browse fixtures and open match intelligence views with ball-by-ball context.
+          </p>
+        </div>
       </div>
-      <MatchesTable data={matches} />
+      <div className="animate-fade-in-up stagger-1">
+        <MatchesTable data={matches} />
+      </div>
     </div>
   );
 }
